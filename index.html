@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suite audit - audited-repo</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1b1b1f; --muted: #5f6368; --line: #e1e3e8;
+    --card: #f7f8fa; --accent: #2b5cd9; --warn: #9a5b00; --bad: #b3261e;
+    --fill: #2b5cd9; --empty: #d9dce3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16171a; --fg: #e8eaed; --muted: #9aa0a6; --line: #2c2e33;
+      --card: #1e2024; --accent: #7aa2f7; --warn: #e0a458; --bad: #f2837c;
+      --fill: #7aa2f7; --empty: #34363c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 20px; background: var(--bg); color: var(--fg);
+    font: 15px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .06em;
+       color: var(--muted); margin: 36px 0 12px; font-weight: 600; }
+  .sub { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+  .headline { background: var(--card); border: 1px solid var(--line);
+              border-radius: 10px; padding: 20px 22px; }
+  .headline.fail { border-color: var(--bad); }
+  .score { font-size: 38px; font-weight: 650; letter-spacing: -.02em; }
+  .score small { font-size: 18px; color: var(--muted); font-weight: 400; }
+  .status { display: inline-block; margin-left: 12px; padding: 3px 10px;
+            border-radius: 999px; font-size: 12px; font-weight: 600;
+            background: var(--bad); color: #fff; vertical-align: 6px; }
+  .caveat { color: var(--muted); font-size: 13px; margin-top: 10px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line);
+           vertical-align: top; font-size: 14px; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px;
+       text-transform: uppercase; letter-spacing: .05em; }
+  td.num { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .meter { display: inline-flex; gap: 3px; margin-left: 8px; vertical-align: 1px; }
+  .meter i { width: 9px; height: 9px; border-radius: 2px; background: var(--empty); }
+  .meter i.on { background: var(--fill); }
+  .tag { display: inline-block; padding: 1px 7px; border-radius: 4px; font-size: 11px;
+         font-weight: 600; margin-right: 5px; border: 1px solid var(--line); color: var(--muted); }
+  .tag.bad { color: var(--bad); border-color: var(--bad); }
+  .tag.warn { color: var(--warn); border-color: var(--warn); }
+  .reason { color: var(--muted); font-size: 13px; margin-top: 6px; }
+  .cites { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+           font-size: 11.5px; color: var(--muted); margin-top: 6px; word-break: break-all; }
+  .panel { background: var(--card); border: 1px solid var(--line);
+           border-left: 3px solid var(--warn); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; }
+  .panel h3 { margin: 0 0 6px; font-size: 14px; }
+  .panel p { margin: 4px 0; font-size: 13.5px; }
+  footer { margin-top: 44px; padding-top: 16px; border-top: 1px solid var(--line);
+           color: var(--muted); font-size: 12px; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+  @media (max-width: 560px) { th:nth-child(4), td:nth-child(4) { display: none; } }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>Suite audit - audited-repo</h1>
+  <p class="sub">
+    adapter <code>qa-framework</code> &middot;
+    evidence <code>6d9a42476dd3</code> &middot;
+    15 test file(s)
+  </p>
+  <p class="sub">
+    suite type <strong>regression</strong>
+  </p>
+
+  <div class="headline">
+    <div class="score">10<small> / 16</small></div>
+    
+    <p class="caveat">
+      This reads the repository only. 16 of the rubric's 21 points are reachable at all;
+      the rest assert facts that live in run history and CI policy. The source rubric's verdict
+      bands are not applied, because they assume evidence this audit does not have.
+    </p>
+  </div>
+
+  <h2>Dimensions</h2>
+  <table>
+    <thead>
+      <tr><th>#</th><th>Dimension</th><th class="num">Level</th><th>Ceiling</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="num">D1</td>
+        <td>
+          <strong>Oracle</strong>
+          
+          <div class="reason">Traceability on paper is high (D1.tc-id-coverage 0.93, D1.spec-linkage 0.933, D5.covered-rules 86/105), and where a rule contradicts the app the test keeps the rule (checkout.spec.ts:225 asserts RN-CART-025 against DEF-DEMO-FRAMEWORK-004; cart-management.spec.ts:113 recomputes $500x3=$1500). But the rule catalogue was itself written by inspecting the running app, so for a large share of tests the rule id only relabels observed output: RN-CAT-048 (01-business-rules.md:55) declares an unhandled JS error as the expected behaviour and cart-badge.spec.ts:135 asserts that the error happens; cart-badge.spec.ts:112 freezes the missing cross-tab sync and cart-management.spec.ts:181 freezes 'no maximum quantity', both filed elsewhere as usability recommendations, and RN-CAT-042 (line 16) literally says 'Observado'. Criterion asserts and observed-output asserts are mixed under the same RN ids with no marker in the test separating them, there is no external id (D1.ext-id-coverage 0) and no risk register (D1.risk-inventory absent), which is level 1, not 2.</div>
+          <div class="cites">cites D1.tc-id-coverage, D1.spec-linkage, D5.covered-rules, D1.ext-id-coverage, D1.risk-inventory</div>
+          <div class="cites">read qa/07-automation/e2e/tests/catalog/cart-badge.spec.ts:126, qa/07-automation/e2e/tests/catalog/cart-badge.spec.ts:135, qa/07-automation/e2e/tests/catalog/cart-badge.spec.ts:112, qa/07-automation/e2e/tests/catalog/cart-badge.spec.ts:26, qa/07-automation/e2e/tests/cart/cart-management.spec.ts:181, qa/01-specifications/module-catalog/submodule-cart-badge/01-business-rules.md:55, qa/01-specifications/module-catalog/submodule-cart-badge/01-business-rules.md:16, qa/07-automation/e2e/tests/cart/checkout.spec.ts:225, qa/07-automation/e2e/tests/cart/cart-management.spec.ts:113</div>
+        </td>
+        <td class="num">1 / 3
+          <span class="meter"><i class="on"></i><i class=""></i><i class=""></i></span></td>
+        <td class="reason">reachable only where a rule inventory exists in the repository</td>
+      </tr>
+      <tr>
+        <td class="num">D2</td>
+        <td>
+          <strong>Sensitivity</strong>
+          <span class="tag warn">calibrated</span>
+          <div class="reason">No test is assertless (D2.assertless-tests 0) and the helper-only tests in D2.indirect-assertions do contain real checks: expectRedirectToLogin is a toHaveURL on /index.php and openCategory asserts the results counter, so session.spec.ts:25 does fail for the behaviour it names. D2.expected-failures reads 0, but six tests use test.fail through expectOpenDefect; the helper is careful (rethrows InfraError, refuses earlier errors, fails when the defect stops reproducing), so those are not permanent greens. The level drops to 1 because tests also fail for causes unrelated to their title: openWithBaseCart (checkout.spec.ts:41) asserts the live catalogue total $800 as a precondition of every field-validation test such as checkout.spec.ts:66, category tests pin live product counts, and cart-badge.spec.ts:135 goes red if the app's unhandled JS error is fixed. In addition the 9 integration tests are framework templates that always skip at runtime (example.spec.ts:21, no-session.spec.ts:20, example-write-cycle.spec.ts:41), which D2.skipped-tests (0) does not see; no mutation config exists (D2.mutation-config 0).</div>
+          <div class="cites">cites D2.assertless-tests, D2.indirect-assertions, D2.weak-assertions, D2.skipped-tests, D2.expected-failures, D2.mutation-config</div>
+          <div class="cites">read qa/07-automation/e2e/tests/auth/session.spec.ts:25, qa/07-automation/e2e/tests/cart/checkout.spec.ts:41, qa/07-automation/e2e/tests/cart/checkout.spec.ts:66, qa/07-automation/e2e/tests/catalog/cart-badge.spec.ts:135, qa/07-automation/e2e/tests/catalog/category-listing.spec.ts:178, qa/07-automation/integration/tests/example.spec.ts:21, qa/07-automation/integration/tests/security/no-session.spec.ts:20, qa/07-automation/integration/tests/write/example-write-cycle.spec.ts:41</div>
+        </td>
+        <td class="num">1 / 3
+          <span class="meter"><i class="on"></i><i class=""></i><i class=""></i></span></td>
+        <td class="reason">level 3 needs measured sensitivity: mutation config in the repository (capped at 2 without it) or a rule broken on purpose, which v1 cannot read</td>
+      </tr>
+      <tr>
+        <td class="num">D3</td>
+        <td>
+          <strong>Determinism</strong>
+          
+          <div class="reason">Synchronization is sound: D3.fixed-waits is 0, D3.conditional-waits only 2, web-first assertions and expect.poll are used (category-listing.spec.ts:191), and each test seeds its own localStorage, so there is no order dependence in e2e. The weakness is the retry policy: D3.retries-config sets retries to 2 in CI with no explanation in playwright.config.ts, and the CI job only fails on steps.tests.outcome == failure, so a test that passes on retry is reported flaky and stays green with nothing in the repository counting it; the only flakiness figure is a one-off stabilization report of 3 runs. The suite also runs against a public third-party demo site whose data it pins, and cart-management.spec.ts:152 reads the DOM right after a Tab press on the assumption that rendering is synchronous. Retries that absorb flakes without a tracked rate is level 1; measured and controlled flakiness (level 2) is not evidenced.</div>
+          <div class="cites">cites D3.fixed-waits, D3.conditional-waits, D3.retries-config, D3.flaky-markers</div>
+          <div class="cites">read qa/07-automation/e2e/tests/cart/cart-management.spec.ts:152, qa/07-automation/e2e/tests/cart/checkout.spec.ts:213, qa/07-automation/e2e/tests/catalog/category-listing.spec.ts:191</div>
+        </td>
+        <td class="num">1 / 2
+          <span class="meter"><i class="on"></i><i class=""></i></span></td>
+        <td class="reason">level 3 asserts behavior across runs, which the repository cannot witness</td>
+      </tr>
+      <tr>
+        <td class="num">D4</td>
+        <td>
+          <strong>Diagnosis</strong>
+          
+          <div class="reason">D4.trace-config keeps trace, video and screenshot on failure for the e2e lane projects, and titles name the behaviour, not the click: '[TC-CART-GEST-012] Eliminar un producto actualiza tabla, total y contador' (cart-management.spec.ts:189), '[TC-CART-CHK-002] Enviar el formulario vacío muestra solo el error del primer campo' (checkout.spec.ts:58); some asserts carry messages (checkout.spec.ts:169). Level 3 is not reached: the report names the TC id, not the business rule, so the RN that broke is found only in the plan; D4.failure-context shows steps in just 19 of 128 tests; and the whole login-flow project (login.login.spec.ts:24 onwards) runs with NO_ARTIFACTS, so its failures carry no trace or screenshot, a deliberate security trade-off that still costs diagnosis. The integration suite has no trace configured.</div>
+          <div class="cites">cites D4.failure-context, D4.trace-config, D4.reporter-config</div>
+          <div class="cites">read qa/07-automation/e2e/tests/cart/cart-management.spec.ts:189, qa/07-automation/e2e/tests/cart/checkout.spec.ts:58, qa/07-automation/e2e/tests/auth/login.login.spec.ts:24, qa/07-automation/e2e/tests/cart/checkout.spec.ts:169</div>
+        </td>
+        <td class="num">2 / 3
+          <span class="meter"><i class="on"></i><i class="on"></i><i class=""></i></span></td>
+        <td class="reason">no structural limit in v1</td>
+      </tr>
+      <tr>
+        <td class="num">D5</td>
+        <td>
+          <strong>Rule coverage</strong>
+          
+          <div class="reason">D5.covered-rules links 86 of 105 catalogued rules, D5.orphan-tests is 0, and D5.negative-tests finds 16 negative and 16 boundary tests that are real (password under 4 chars at login.login.spec.ts:106, empty and decimal quantity at cart-management.spec.ts:169, phone length 9 and 11 at checkout.spec.ts:120). Of the 19 D5.uncovered-rules, 17 are FL- workflow ids and the two RN ids look like linkage misses rather than gaps: RN-AUTH-014 (session/01-business-rules.md:3) is mapped to TC-AUTH-LOGIN-001 in the test plan, and RN-CAT-024 to TC-CAT-LIST-002. Nothing in the repository says any rule was left out on purpose, and D5.risk-coverage is empty because there is no risk register, so the selection criterion is implicit: level 2.</div>
+          <div class="cites">cites D5.rule-catalogue, D5.covered-rules, D5.uncovered-rules, D5.orphan-tests, D5.risk-coverage, D5.negative-tests</div>
+          <div class="cites">read qa/07-automation/e2e/tests/auth/login.login.spec.ts:106, qa/07-automation/e2e/tests/cart/cart-management.spec.ts:169, qa/07-automation/e2e/tests/cart/checkout.spec.ts:120, qa/01-specifications/module-auth/submodule-session/01-business-rules.md:3</div>
+        </td>
+        <td class="num">2 / 2
+          <span class="meter"><i class="on"></i><i class="on"></i></span></td>
+        <td class="reason">level 3 needs the deliberate exclusions written down; v1 extracts no such statement</td>
+      </tr>
+      <tr>
+        <td class="num">D6</td>
+        <td>
+          <strong>Life in CI</strong>
+          <span class="tag">settled by evidence</span>
+          <div class="reason">Determined at 1 by D6.runs-the-suite. Context the number hides: D6.pipeline-triggers shows workflow_dispatch only (no push, no pull_request, no schedule), so the suite never runs unless someone launches it and cannot block a merge; D6.run-scope shows it runs only the chromium and login-flow projects against the public site, and the integration suite is never invoked by any pipeline.</div>
+          <div class="cites">cites D6.pipeline-present, D6.suite-invocation, D6.pipeline-triggers, D6.run-scope</div>
+          
+        </td>
+        <td class="num">1 / 1
+          <span class="meter"><i class="on"></i></span></td>
+        <td class="reason">levels 2 and 3 assert merge and deploy gating, which lives in the CI server policy</td>
+      </tr>
+      <tr>
+        <td class="num">D7</td>
+        <td>
+          <strong>Maintainability</strong>
+          
+          <div class="reason">D7.selector-mix is 165 data-testid locators against 19 raw ones, D7.file-size is moderate (max 20 tests per file, median 8), and titles are business language with TC id and priority. Layering is only partial: there are two page objects (Login, Checkout) and the cart and catalog specs drive the DOM inline with getByTestId and raw prefix selectors such as [data-testid^=&quot;cart-row-&quot;]. Duplication is structural, not incidental: the same dialog-collector block is copied at cart-management.spec.ts:39, :135, :195 and cart-badge.spec.ts:88, and spec-local helpers (openCart and setQty at cart-management.spec.ts:14, cellTexts at checkout.spec.ts:14) live outside the shared fixtures. Business names and separated layers with residual duplication is level 2; level 3 needs review and retirement evidence v1 does not read.</div>
+          <div class="cites">cites D7.selector-mix, D7.file-size, D7.page-object-usage</div>
+          <div class="cites">read qa/07-automation/e2e/tests/cart/cart-management.spec.ts:39, qa/07-automation/e2e/tests/cart/cart-management.spec.ts:135, qa/07-automation/e2e/tests/cart/cart-management.spec.ts:195, qa/07-automation/e2e/tests/catalog/cart-badge.spec.ts:88, qa/07-automation/e2e/tests/cart/cart-management.spec.ts:14, qa/07-automation/e2e/tests/cart/checkout.spec.ts:14</div>
+        </td>
+        <td class="num">2 / 2
+          <span class="meter"><i class="on"></i><i class="on"></i></span></td>
+        <td class="reason">level 3 needs review and retirement process evidence; v1 does not read history</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <h2>Questions for the team</h2>
+  <table>
+    <thead>
+      <tr><th>#</th><th>Question</th><th>What an answer does</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="num">D2</td>
+        <td>
+          Is mutation testing run against this suite anywhere, and where is its configuration?
+          <div class="reason">only a mutation testing configuration committed to this repository is read by this release, and none was found; a rule broken on purpose by hand also satisfies the rubric but leaves no trace this release can read</div>
+          <div class="cites">D2.sensitivity-measured</div>
+        </td>
+        <td><span class="tag warn">read by this release</span>
+          <div class="reason">lifts the bound to level 3 once the answer is committed to the repository and the evidence is extracted again</div></td>
+      </tr>
+      <tr>
+        <td class="num">D3</td>
+        <td>
+          Is the failure rate of these tests across runs measured anywhere, and where can it be read?
+          <div class="reason">level 3 asserts behavior across runs, which the repository cannot witness</div>
+          <div class="cites">D3.flakiness-measured</div>
+        </td>
+        <td><span class="tag">for the reader</span>
+          <div class="reason">the bound stays; an answer records what a future extractor would need (level 3 would then be allowed)</div></td>
+      </tr>
+      <tr>
+        <td class="num">D5</td>
+        <td>
+          Are any business rules left out of the suite on purpose, and where is that decision written down?
+          <div class="reason">level 3 needs the deliberate exclusions written down; v1 extracts no such statement</div>
+          <div class="cites">D5.deliberate-exclusions</div>
+        </td>
+        <td><span class="tag">for the reader</span>
+          <div class="reason">the bound stays; an answer records what a future extractor would need (level 3 would then be allowed)</div></td>
+      </tr>
+      <tr>
+        <td class="num">D6</td>
+        <td>
+          Is a passing run of this suite a condition of deployment, and where is that configured?
+          <div class="reason">levels 2 and 3 assert merge and deploy gating, which lives in the CI server policy</div>
+          <div class="cites">D6.deployment-condition</div>
+        </td>
+        <td><span class="tag">for the reader</span>
+          <div class="reason">the bound stays; an answer records what a future extractor would need (level 3 would then be allowed)</div></td>
+      </tr>
+      <tr>
+        <td class="num">D6</td>
+        <td>
+          Does a failing run of this suite block the merge, and where is that configured?
+          <div class="reason">levels 2 and 3 assert merge and deploy gating, which lives in the CI server policy</div>
+          <div class="cites">D6.merge-blocking</div>
+        </td>
+        <td><span class="tag">for the reader</span>
+          <div class="reason">the bound stays; an answer records what a future extractor would need (level 3 would then be allowed)</div></td>
+      </tr>
+      <tr>
+        <td class="num">D7</td>
+        <td>
+          Is there a process for reviewing and retiring tests, and where is it written down?
+          <div class="reason">level 3 needs review and retirement process evidence; v1 does not read history</div>
+          <div class="cites">D7.review-retirement</div>
+        </td>
+        <td><span class="tag">for the reader</span>
+          <div class="reason">the bound stays; an answer records what a future extractor would need (level 3 would then be allowed)</div></td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="reason">Questions marked read by this release lift their bound once the answer is committed to the repository and the evidence is extracted again. The others are for the reader of this report: they record what a future extractor would need, and the bound stays where it is.</p>
+
+
+  <h2>Decided by calibration, not by the rubric</h2>
+  <div class="panel">
+    <h3>D2 Sensitivity</h3>
+    <p>no mutation testing configuration found in the repository</p>
+    <p><strong>capped at 2 - level 3 needs measured sensitivity; a rule broken on purpose leaves no trace v1 reads</strong></p>
+    <p class="reason">with no mutation testing configuration in the repository (D2.mutation-config empty), the dimension cannot exceed level 2; a config lifts the cap but never sets a floor</p>
+  </div>
+  <div class="panel">
+    <p>These boundaries are choices, recorded in <code>thresholds.json</code> with the rubric text
+    they interpret and what moving them costs. Change a value there and this result changes with it.
+    That is the point: a line somebody drew by hand should be visible to whoever reads the number.</p>
+  </div>
+
+
+
+  <h2>Threshold objections</h2>
+  <div class="panel">
+    <p>D7.selector-fragility counts data-testid as semantic (semanticShare 0.897 with semantic 0, testId 165). That is a defensible reading, but the share says nothing about role or label queries; it did not change this verdict because D7 was not capped.</p>
+<p>D2.expected-failures reports 0 because test.fail is reached through a helper (fixtures/defects.ts expectOpenDefect); six tests are expected failures. D2.skipped-tests reports 0 although the 9 integration tests skip at runtime through test.skip(condition) at describe level. Neither moved a bound here, but both counts understate what a reader should know.</p>
+  </div>
+
+
+  <h2>Notes</h2>
+  <div class="panel"><p>Total 10 over 16 attainable (maxPossibleGivenEvidence 15). Structural v1 ceilings: D3 at 2 (cross-run behaviour), D5 at 2 (deliberate exclusions not extracted), D6 at 1 (merge and deploy gating live in CI server policy), D7 at 2 (no review history); D2 capped at 2 by the calibrated threshold D2.sensitivity-measured because no mutation configuration exists. No eliminatory dimension is at 0, but both eliminatory dimensions (D1, D2) sit at 1, one step above elimination. D1 is a borderline judgement: the suite has strong rule linkage and genuine spec-first defect tests, and lands at 1 rather than 2 because the specification was derived from the running application and several asserted 'rules' encode observed behaviour, including an unhandled JS error. The test count of 128 includes 9 integration templates that never execute; the effective suite is 119 e2e tests.</p></div>
+
+  <footer>
+    Evidence digest <code>6d9a42476dd3edb264df5e810b6d30d58237d655fe48208f144e4a92ea295e85</code>.
+    A verdict is bound to one digest: if the suite changes, this report describes a repository
+    state that no longer exists and must be regenerated rather than edited.
+  </footer>
+
+</main>
+</body>
+</html>
