@@ -1,0 +1,74 @@
+Suite audit  audited-repo
+  adapter qa-framework   evidence 6d9a42476dd3   15 test file(s)
+  suite type regression
+
+  RESULT   10/16
+           v1 reads the repository only; 16 of 21 points are reachable at all
+
+  D1 Oracle           1/3  #.. 
+  D2 Sensitivity      1/3  #..   calibrated threshold
+  D3 Determinism      1/2  #.  
+  D4 Diagnosis        2/3  ##. 
+  D5 Rule coverage    2/2  ##  
+  D6 Life in CI       1/1  #     settled by evidence
+  D7 Maintainability  2/2  ##  
+
+  QUESTIONS FOR THE TEAM
+    D2 D2.sensitivity-measured  [read by this release]
+       Is mutation testing run against this suite anywhere, and where is
+       its configuration?
+       lifts the bound to level 3 once the answer is committed to the
+       repository and the evidence is extracted again
+    D3 D3.flakiness-measured  [for the reader]
+       Is the failure rate of these tests across runs measured anywhere,
+       and where can it be read?
+       the bound stays; an answer records what a future extractor would
+       need (level 3 would then be allowed)
+    D5 D5.deliberate-exclusions  [for the reader]
+       Are any business rules left out of the suite on purpose, and where
+       is that decision written down?
+       the bound stays; an answer records what a future extractor would
+       need (level 3 would then be allowed)
+    D6 D6.deployment-condition  [for the reader]
+       Is a passing run of this suite a condition of deployment, and where
+       is that configured?
+       the bound stays; an answer records what a future extractor would
+       need (level 3 would then be allowed)
+    D6 D6.merge-blocking  [for the reader]
+       Does a failing run of this suite block the merge, and where is that
+       configured?
+       the bound stays; an answer records what a future extractor would
+       need (level 3 would then be allowed)
+    D7 D7.review-retirement  [for the reader]
+       Is there a process for reviewing and retiring tests, and where is it
+       written down?
+       the bound stays; an answer records what a future extractor would
+       need (level 3 would then be allowed)
+    Questions marked read by this release lift their bound once the
+    answer is committed to the repository and the evidence is extracted
+    again. The others are for the reader of this report: they record
+    what a future extractor would need, and the bound stays where it is.
+
+  DECIDED BY CALIBRATION, NOT BY THE RUBRIC TEXT
+    D2 Sensitivity: no mutation testing configuration found in the repository
+       capped at 2 - level 3 needs measured sensitivity; a rule broken on purpose leaves no trace v1 reads
+    Move a value in thresholds.json and this result moves with it.
+
+  THRESHOLD OBJECTIONS RAISED
+    D7.selector-fragility counts data-testid as semantic (semanticShare 0.897 with semantic 0, testId 165). That is a defensible reading, but the share says nothing about role or label queries; it did not change this verdict because D7 was not capped.
+    D2.expected-failures reports 0 because test.fail is reached through a helper (fixtures/defects.ts expectOpenDefect); six tests are expected failures. D2.skipped-tests reports 0 although the 9 integration tests skip at runtime through test.skip(condition) at describe level. Neither moved a bound here, but both counts understate what a reader should know.
+
+  NOTES  Total 10 over 16 attainable (maxPossibleGivenEvidence 15).
+         Structural v1 ceilings: D3 at 2 (cross-run behaviour), D5 at 2
+         (deliberate exclusions not extracted), D6 at 1 (merge and deploy
+         gating live in CI server policy), D7 at 2 (no review history); D2
+         capped at 2 by the calibrated threshold D2.sensitivity-measured
+         because no mutation configuration exists. No eliminatory dimension
+         is at 0, but both eliminatory dimensions (D1, D2) sit at 1, one step
+         above elimination. D1 is a borderline judgement: the suite has
+         strong rule linkage and genuine spec-first defect tests, and lands
+         at 1 rather than 2 because the specification was derived from the
+         running application and several asserted 'rules' encode observed
+         behaviour, including an unhandled JS error. The test count of 128
+         includes 9 integration templates that never execute; the effective
+         suite is 119 e2e tests.

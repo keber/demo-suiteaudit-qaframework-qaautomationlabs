@@ -1,0 +1,117 @@
+{
+  "schema": "verdict/v2",
+  "repo": "audited-repo",
+  "evidenceDigest": "6d9a42476dd3edb264df5e810b6d30d58237d655fe48208f144e4a92ea295e85",
+  "suiteType": {
+    "type": "regression",
+    "citations": ["D0.suite-type-signals"],
+    "reasoning": "D0.suite-type-signals shows zero defect ids in titles or file names, zero declared expected failures and zero snapshot assertions, and 111 of 119 e2e case ids link to a declared rule: the intent is regression against qa/01-specifications. Six e2e tests are defect-harness tests embedded in regression files (expectOpenDefect calls test.fail dynamically, fixtures/defects.ts:164 and :170, used at session.spec.ts:44 and :79, cart-management.spec.ts:158, checkout.spec.ts:225, :244, :267), which the static signal does not count. The three integration groups (9 tests) are unconfigured framework templates that skip at runtime, so they carry no oracle of their own and do not justify a mixed breakdown."
+  },
+  "levels": [
+    {
+      "dimension": 1,
+      "level": 1,
+      "confidence": "medium",
+      "citations": ["D1.tc-id-coverage", "D1.spec-linkage", "D5.covered-rules", "D1.ext-id-coverage", "D1.risk-inventory"],
+      "observations": [
+        "qa/07-automation/e2e/tests/catalog/cart-badge.spec.ts:126",
+        "qa/07-automation/e2e/tests/catalog/cart-badge.spec.ts:135",
+        "qa/07-automation/e2e/tests/catalog/cart-badge.spec.ts:112",
+        "qa/07-automation/e2e/tests/catalog/cart-badge.spec.ts:26",
+        "qa/07-automation/e2e/tests/cart/cart-management.spec.ts:181",
+        "qa/01-specifications/module-catalog/submodule-cart-badge/01-business-rules.md:55",
+        "qa/01-specifications/module-catalog/submodule-cart-badge/01-business-rules.md:16",
+        "qa/07-automation/e2e/tests/cart/checkout.spec.ts:225",
+        "qa/07-automation/e2e/tests/cart/cart-management.spec.ts:113"
+      ],
+      "reasoning": "Traceability on paper is high (D1.tc-id-coverage 0.93, D1.spec-linkage 0.933, D5.covered-rules 86/105), and where a rule contradicts the app the test keeps the rule (checkout.spec.ts:225 asserts RN-CART-025 against DEF-DEMO-FRAMEWORK-004; cart-management.spec.ts:113 recomputes $500x3=$1500). But the rule catalogue was itself written by inspecting the running app, so for a large share of tests the rule id only relabels observed output: RN-CAT-048 (01-business-rules.md:55) declares an unhandled JS error as the expected behaviour and cart-badge.spec.ts:135 asserts that the error happens; cart-badge.spec.ts:112 freezes the missing cross-tab sync and cart-management.spec.ts:181 freezes 'no maximum quantity', both filed elsewhere as usability recommendations, and RN-CAT-042 (line 16) literally says 'Observado'. Criterion asserts and observed-output asserts are mixed under the same RN ids with no marker in the test separating them, there is no external id (D1.ext-id-coverage 0) and no risk register (D1.risk-inventory absent), which is level 1, not 2."
+    },
+    {
+      "dimension": 2,
+      "level": 1,
+      "confidence": "medium",
+      "citations": ["D2.assertless-tests", "D2.indirect-assertions", "D2.weak-assertions", "D2.skipped-tests", "D2.expected-failures", "D2.mutation-config"],
+      "observations": [
+        "qa/07-automation/e2e/tests/auth/session.spec.ts:25",
+        "qa/07-automation/e2e/tests/cart/checkout.spec.ts:41",
+        "qa/07-automation/e2e/tests/cart/checkout.spec.ts:66",
+        "qa/07-automation/e2e/tests/catalog/cart-badge.spec.ts:135",
+        "qa/07-automation/e2e/tests/catalog/category-listing.spec.ts:178",
+        "qa/07-automation/integration/tests/example.spec.ts:21",
+        "qa/07-automation/integration/tests/security/no-session.spec.ts:20",
+        "qa/07-automation/integration/tests/write/example-write-cycle.spec.ts:41"
+      ],
+      "reasoning": "No test is assertless (D2.assertless-tests 0) and the helper-only tests in D2.indirect-assertions do contain real checks: expectRedirectToLogin is a toHaveURL on /index.php and openCategory asserts the results counter, so session.spec.ts:25 does fail for the behaviour it names. D2.expected-failures reads 0, but six tests use test.fail through expectOpenDefect; the helper is careful (rethrows InfraError, refuses earlier errors, fails when the defect stops reproducing), so those are not permanent greens. The level drops to 1 because tests also fail for causes unrelated to their title: openWithBaseCart (checkout.spec.ts:41) asserts the live catalogue total $800 as a precondition of every field-validation test such as checkout.spec.ts:66, category tests pin live product counts, and cart-badge.spec.ts:135 goes red if the app's unhandled JS error is fixed. In addition the 9 integration tests are framework templates that always skip at runtime (example.spec.ts:21, no-session.spec.ts:20, example-write-cycle.spec.ts:41), which D2.skipped-tests (0) does not see; no mutation config exists (D2.mutation-config 0)."
+    },
+    {
+      "dimension": 3,
+      "level": 1,
+      "confidence": "medium",
+      "citations": ["D3.fixed-waits", "D3.conditional-waits", "D3.retries-config", "D3.flaky-markers"],
+      "observations": [
+        "qa/07-automation/e2e/tests/cart/cart-management.spec.ts:152",
+        "qa/07-automation/e2e/tests/cart/checkout.spec.ts:213",
+        "qa/07-automation/e2e/tests/catalog/category-listing.spec.ts:191"
+      ],
+      "reasoning": "Synchronization is sound: D3.fixed-waits is 0, D3.conditional-waits only 2, web-first assertions and expect.poll are used (category-listing.spec.ts:191), and each test seeds its own localStorage, so there is no order dependence in e2e. The weakness is the retry policy: D3.retries-config sets retries to 2 in CI with no explanation in playwright.config.ts, and the CI job only fails on steps.tests.outcome == failure, so a test that passes on retry is reported flaky and stays green with nothing in the repository counting it; the only flakiness figure is a one-off stabilization report of 3 runs. The suite also runs against a public third-party demo site whose data it pins, and cart-management.spec.ts:152 reads the DOM right after a Tab press on the assumption that rendering is synchronous. Retries that absorb flakes without a tracked rate is level 1; measured and controlled flakiness (level 2) is not evidenced."
+    },
+    {
+      "dimension": 4,
+      "level": 2,
+      "confidence": "high",
+      "citations": ["D4.failure-context", "D4.trace-config", "D4.reporter-config"],
+      "observations": [
+        "qa/07-automation/e2e/tests/cart/cart-management.spec.ts:189",
+        "qa/07-automation/e2e/tests/cart/checkout.spec.ts:58",
+        "qa/07-automation/e2e/tests/auth/login.login.spec.ts:24",
+        "qa/07-automation/e2e/tests/cart/checkout.spec.ts:169"
+      ],
+      "reasoning": "D4.trace-config keeps trace, video and screenshot on failure for the e2e lane projects, and titles name the behaviour, not the click: '[TC-CART-GEST-012] Eliminar un producto actualiza tabla, total y contador' (cart-management.spec.ts:189), '[TC-CART-CHK-002] Enviar el formulario vacío muestra solo el error del primer campo' (checkout.spec.ts:58); some asserts carry messages (checkout.spec.ts:169). Level 3 is not reached: the report names the TC id, not the business rule, so the RN that broke is found only in the plan; D4.failure-context shows steps in just 19 of 128 tests; and the whole login-flow project (login.login.spec.ts:24 onwards) runs with NO_ARTIFACTS, so its failures carry no trace or screenshot, a deliberate security trade-off that still costs diagnosis. The integration suite has no trace configured."
+    },
+    {
+      "dimension": 5,
+      "level": 2,
+      "confidence": "medium",
+      "citations": ["D5.rule-catalogue", "D5.covered-rules", "D5.uncovered-rules", "D5.orphan-tests", "D5.risk-coverage", "D5.negative-tests"],
+      "observations": [
+        "qa/07-automation/e2e/tests/auth/login.login.spec.ts:106",
+        "qa/07-automation/e2e/tests/cart/cart-management.spec.ts:169",
+        "qa/07-automation/e2e/tests/cart/checkout.spec.ts:120",
+        "qa/01-specifications/module-auth/submodule-session/01-business-rules.md:3"
+      ],
+      "reasoning": "D5.covered-rules links 86 of 105 catalogued rules, D5.orphan-tests is 0, and D5.negative-tests finds 16 negative and 16 boundary tests that are real (password under 4 chars at login.login.spec.ts:106, empty and decimal quantity at cart-management.spec.ts:169, phone length 9 and 11 at checkout.spec.ts:120). Of the 19 D5.uncovered-rules, 17 are FL- workflow ids and the two RN ids look like linkage misses rather than gaps: RN-AUTH-014 (session/01-business-rules.md:3) is mapped to TC-AUTH-LOGIN-001 in the test plan, and RN-CAT-024 to TC-CAT-LIST-002. Nothing in the repository says any rule was left out on purpose, and D5.risk-coverage is empty because there is no risk register, so the selection criterion is implicit: level 2."
+    },
+    {
+      "dimension": 6,
+      "level": 1,
+      "confidence": "high",
+      "citations": ["D6.pipeline-present", "D6.suite-invocation", "D6.pipeline-triggers", "D6.run-scope"],
+      "observations": [],
+      "reasoning": "Determined at 1 by D6.runs-the-suite. Context the number hides: D6.pipeline-triggers shows workflow_dispatch only (no push, no pull_request, no schedule), so the suite never runs unless someone launches it and cannot block a merge; D6.run-scope shows it runs only the chromium and login-flow projects against the public site, and the integration suite is never invoked by any pipeline."
+    },
+    {
+      "dimension": 7,
+      "level": 2,
+      "confidence": "medium",
+      "citations": ["D7.selector-mix", "D7.file-size", "D7.page-object-usage"],
+      "observations": [
+        "qa/07-automation/e2e/tests/cart/cart-management.spec.ts:39",
+        "qa/07-automation/e2e/tests/cart/cart-management.spec.ts:135",
+        "qa/07-automation/e2e/tests/cart/cart-management.spec.ts:195",
+        "qa/07-automation/e2e/tests/catalog/cart-badge.spec.ts:88",
+        "qa/07-automation/e2e/tests/cart/cart-management.spec.ts:14",
+        "qa/07-automation/e2e/tests/cart/checkout.spec.ts:14"
+      ],
+      "reasoning": "D7.selector-mix is 165 data-testid locators against 19 raw ones, D7.file-size is moderate (max 20 tests per file, median 8), and titles are business language with TC id and priority. Layering is only partial: there are two page objects (Login, Checkout) and the cart and catalog specs drive the DOM inline with getByTestId and raw prefix selectors such as [data-testid^=\"cart-row-\"]. Duplication is structural, not incidental: the same dialog-collector block is copied at cart-management.spec.ts:39, :135, :195 and cart-badge.spec.ts:88, and spec-local helpers (openCart and setQty at cart-management.spec.ts:14, cellTexts at checkout.spec.ts:14) live outside the shared fixtures. Business names and separated layers with residual duplication is level 2; level 3 needs review and retirement evidence v1 does not read."
+    }
+  ],
+  "obtained": 10,
+  "attainable": 16,
+  "eliminated": false,
+  "eliminatedBy": [],
+  "thresholdObjections": [
+    "D7.selector-fragility counts data-testid as semantic (semanticShare 0.897 with semantic 0, testId 165). That is a defensible reading, but the share says nothing about role or label queries; it did not change this verdict because D7 was not capped.",
+    "D2.expected-failures reports 0 because test.fail is reached through a helper (fixtures/defects.ts expectOpenDefect); six tests are expected failures. D2.skipped-tests reports 0 although the 9 integration tests skip at runtime through test.skip(condition) at describe level. Neither moved a bound here, but both counts understate what a reader should know."
+  ],
+  "notes": "Total 10 over 16 attainable (maxPossibleGivenEvidence 15). Structural v1 ceilings: D3 at 2 (cross-run behaviour), D5 at 2 (deliberate exclusions not extracted), D6 at 1 (merge and deploy gating live in CI server policy), D7 at 2 (no review history); D2 capped at 2 by the calibrated threshold D2.sensitivity-measured because no mutation configuration exists. No eliminatory dimension is at 0, but both eliminatory dimensions (D1, D2) sit at 1, one step above elimination. D1 is a borderline judgement: the suite has strong rule linkage and genuine spec-first defect tests, and lands at 1 rather than 2 because the specification was derived from the running application and several asserted 'rules' encode observed behaviour, including an unhandled JS error. The test count of 128 includes 9 integration templates that never execute; the effective suite is 119 e2e tests."
+}

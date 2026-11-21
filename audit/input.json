@@ -1,0 +1,1524 @@
+{
+  "schema": "judgment-input/v1",
+  "repo": "audited-repo",
+  "adapter": {
+    "name": "qa-framework",
+    "description": "rules in 01-business-rules.md, cases in 05-test-scenarios.md, linked by co-occurrence",
+    "specsRoot": "qa/01-specifications"
+  },
+  "evidenceDigest": "6d9a42476dd3edb264df5e810b6d30d58237d655fe48208f144e4a92ea295e85",
+  "attainable": 16,
+  "maxPossibleGivenEvidence": 15,
+  "determinedDimensions": 1,
+  "openQuestions": 6,
+  "dimensions": [
+    {
+      "dimension": 1,
+      "name": "Oracle",
+      "eliminatory": true,
+      "ceiling": 3,
+      "ceilingReason": "reachable only where a rule inventory exists in the repository",
+      "bounds": {
+        "min": 0,
+        "max": 3
+      },
+      "determined": null,
+      "constraints": [],
+      "mustCite": [
+        "D1.tc-id-coverage",
+        "D1.ext-id-coverage",
+        "D1.spec-linkage",
+        "D5.covered-rules",
+        "D1.risk-inventory"
+      ],
+      "question": "Read a sample of tests against the rules they cite. Do the expected values encode the rule, or does the test merely carry the rule id while asserting whatever the system returns?"
+    },
+    {
+      "dimension": 2,
+      "name": "Sensitivity",
+      "eliminatory": true,
+      "ceiling": 3,
+      "ceilingReason": "level 3 needs measured sensitivity: mutation config in the repository (capped at 2 without it) or a rule broken on purpose, which v1 cannot read",
+      "bounds": {
+        "min": 0,
+        "max": 2
+      },
+      "determined": null,
+      "constraints": [
+        {
+          "threshold": "D2.sensitivity-measured",
+          "kind": "calibration",
+          "rule": "with no mutation testing configuration in the repository (D2.mutation-config empty), the dimension cannot exceed level 2; a config lifts the cap but never sets a floor",
+          "observed": "no mutation testing configuration found in the repository",
+          "effect": "capped at 2 - level 3 needs measured sensitivity; a rule broken on purpose leaves no trace v1 reads",
+          "capsAt": 2
+        }
+      ],
+      "mustCite": [
+        "D2.assertless-tests",
+        "D2.indirect-assertions",
+        "D2.weak-assertions",
+        "D2.skipped-tests",
+        "D2.expected-failures",
+        "D2.mutation-config"
+      ],
+      "question": "Read the tests that assert only through helpers. Do those helpers contain a real check, and does each test fail for the behavior its title names?"
+    },
+    {
+      "dimension": 3,
+      "name": "Determinism",
+      "eliminatory": false,
+      "ceiling": 2,
+      "ceilingReason": "level 3 asserts behavior across runs, which the repository cannot witness",
+      "bounds": {
+        "min": 0,
+        "max": 2
+      },
+      "determined": null,
+      "constraints": [],
+      "mustCite": [
+        "D3.fixed-waits",
+        "D3.conditional-waits"
+      ],
+      "question": "Read the fixed waits and the retries setting in context. Are they load tolerance decisions the config explains, or flake suppression?"
+    },
+    {
+      "dimension": 4,
+      "name": "Diagnosis",
+      "eliminatory": false,
+      "ceiling": 3,
+      "ceilingReason": "no structural limit in v1",
+      "bounds": {
+        "min": 0,
+        "max": 3
+      },
+      "determined": null,
+      "constraints": [],
+      "mustCite": [
+        "D4.failure-context"
+      ],
+      "question": "Read the test titles. Does a failure report name the business behavior that broke, or only the mechanism that was clicked?"
+    },
+    {
+      "dimension": 5,
+      "name": "Rule coverage",
+      "eliminatory": false,
+      "ceiling": 2,
+      "ceilingReason": "level 3 needs the deliberate exclusions written down; v1 extracts no such statement",
+      "bounds": {
+        "min": 0,
+        "max": 2
+      },
+      "determined": null,
+      "constraints": [],
+      "mustCite": [
+        "D5.rule-catalogue",
+        "D5.covered-rules",
+        "D5.uncovered-rules",
+        "D5.orphan-tests",
+        "D5.risk-coverage"
+      ],
+      "question": "Read the uncovered rules. Are they absent by decision or by oversight, and does anything in the repository say which?"
+    },
+    {
+      "dimension": 6,
+      "name": "Life in CI",
+      "eliminatory": false,
+      "ceiling": 1,
+      "ceilingReason": "levels 2 and 3 assert merge and deploy gating, which lives in the CI server policy",
+      "bounds": {
+        "min": 1,
+        "max": 1
+      },
+      "determined": 1,
+      "constraints": [
+        {
+          "threshold": "D6.runs-the-suite",
+          "kind": "literal",
+          "rule": "level 1 requires a pipeline that both invokes the runner and points at the resolved suite; otherwise level 0",
+          "observed": "1 pipeline(s) both invoke the runner and point at the suite",
+          "effect": "determined at 1",
+          "capsAt": 1
+        }
+      ],
+      "mustCite": [
+        "D6.pipeline-present",
+        "D6.suite-invocation",
+        "D6.pipeline-triggers"
+      ],
+      "question": null
+    },
+    {
+      "dimension": 7,
+      "name": "Maintainability",
+      "eliminatory": false,
+      "ceiling": 2,
+      "ceilingReason": "level 3 needs review and retirement process evidence; v1 does not read history",
+      "bounds": {
+        "min": 0,
+        "max": 2
+      },
+      "determined": null,
+      "constraints": [],
+      "mustCite": [
+        "D7.selector-mix",
+        "D7.file-size"
+      ],
+      "question": "Read the test names and the largest files. Do names describe behavior or implementation, and is duplication structural or incidental?"
+    }
+  ],
+  "teamQuestions": [
+    {
+      "id": "D2.sensitivity-measured",
+      "dimension": 2,
+      "question": "Is mutation testing run against this suite anywhere, and where is its configuration?",
+      "unlocks": 3,
+      "reason": "only a mutation testing configuration committed to this repository is read by this release, and none was found; a rule broken on purpose by hand also satisfies the rubric but leaves no trace this release can read",
+      "source": "cap",
+      "readByThisRelease": true
+    },
+    {
+      "id": "D3.flakiness-measured",
+      "dimension": 3,
+      "question": "Is the failure rate of these tests across runs measured anywhere, and where can it be read?",
+      "unlocks": 3,
+      "reason": "level 3 asserts behavior across runs, which the repository cannot witness",
+      "source": "ceiling",
+      "readByThisRelease": false
+    },
+    {
+      "id": "D5.deliberate-exclusions",
+      "dimension": 5,
+      "question": "Are any business rules left out of the suite on purpose, and where is that decision written down?",
+      "unlocks": 3,
+      "reason": "level 3 needs the deliberate exclusions written down; v1 extracts no such statement",
+      "source": "ceiling",
+      "readByThisRelease": false
+    },
+    {
+      "id": "D6.deployment-condition",
+      "dimension": 6,
+      "question": "Is a passing run of this suite a condition of deployment, and where is that configured?",
+      "unlocks": 3,
+      "reason": "levels 2 and 3 assert merge and deploy gating, which lives in the CI server policy",
+      "source": "ceiling",
+      "readByThisRelease": false
+    },
+    {
+      "id": "D6.merge-blocking",
+      "dimension": 6,
+      "question": "Does a failing run of this suite block the merge, and where is that configured?",
+      "unlocks": 3,
+      "reason": "levels 2 and 3 assert merge and deploy gating, which lives in the CI server policy",
+      "source": "ceiling",
+      "readByThisRelease": false
+    },
+    {
+      "id": "D7.review-retirement",
+      "dimension": 7,
+      "question": "Is there a process for reviewing and retiring tests, and where is it written down?",
+      "unlocks": 3,
+      "reason": "level 3 needs review and retirement process evidence; v1 does not read history",
+      "source": "ceiling",
+      "readByThisRelease": false
+    }
+  ],
+  "items": {
+    "source": {
+      "D1.test-inventory": {
+        "tests": 128,
+        "files": 15
+      },
+      "D1.tc-id-coverage": {
+        "withCaseId": 119,
+        "of": 128,
+        "ratio": 0.93
+      },
+      "D1.ext-id-coverage": {
+        "withExternalId": 0,
+        "of": 128,
+        "ratio": 0
+      },
+      "D2.assertless-tests": {
+        "count": 0,
+        "of": 128,
+        "tests": []
+      },
+      "D2.indirect-assertions": {
+        "count": 6,
+        "of": 128,
+        "proxyCalls": 48,
+        "evidenceClass": "inferential",
+        "tests": [
+          "qa/07-automation/e2e/tests/auth/session.spec.ts:25",
+          "qa/07-automation/e2e/tests/cart/cart-management.spec.ts:28",
+          "qa/07-automation/e2e/tests/cart/checkout.spec.ts:24",
+          "qa/07-automation/e2e/tests/catalog/category-listing.spec.ts:178",
+          "qa/07-automation/e2e/tests/catalog/category-listing.spec.ts:219",
+          "qa/07-automation/integration/tests/security/no-session.spec.ts:25"
+        ]
+      },
+      "D2.weak-assertions": {
+        "weakOnlyTests": 7,
+        "weakAssertions": 60,
+        "tests": [
+          "qa/07-automation/e2e/tests/auth/login.login.spec.ts:261",
+          "qa/07-automation/e2e/tests/auth/session.spec.ts:19",
+          "qa/07-automation/e2e/tests/cart/cart-management.spec.ts:229",
+          "qa/07-automation/e2e/tests/catalog/product-detail.spec.ts:48",
+          "qa/07-automation/e2e/tests/catalog/shop-landing.spec.ts:15",
+          "qa/07-automation/e2e/tests/catalog/shop-landing.spec.ts:94",
+          "qa/07-automation/integration/tests/write/example-write-cycle.spec.ts:63"
+        ]
+      },
+      "D2.assert-density": {
+        "assertions": 394,
+        "perActiveTest": 3.078
+      },
+      "D2.soft-assertions": {
+        "count": 0
+      },
+      "D2.skipped-tests": {
+        "count": 0,
+        "of": 128,
+        "ratio": 0
+      },
+      "D2.only-markers": {
+        "count": 0
+      },
+      "D2.conditional-skips": {
+        "count": 2,
+        "tests": [
+          "qa/07-automation/integration/tests/security/read-only-guard.spec.ts:35",
+          "qa/07-automation/integration/tests/security/read-only-guard.spec.ts:46"
+        ]
+      },
+      "D2.expected-failures": {
+        "count": 0,
+        "tests": []
+      },
+      "D3.fixed-waits": {
+        "count": 0,
+        "perTest": 0,
+        "tests": []
+      },
+      "D3.conditional-waits": {
+        "count": 2,
+        "perTest": 0.016
+      },
+      "D3.flaky-markers": {
+        "count": 0,
+        "tags": {
+          "count": 0,
+          "tests": []
+        },
+        "comments": {
+          "count": 0,
+          "at": []
+        }
+      },
+      "D4.failure-context": {
+        "steps": 26,
+        "testsWithSteps": 19
+      },
+      "D5.priority-distribution": {
+        "P0": 28,
+        "P1": 51,
+        "P2": 39,
+        "P3": 10
+      },
+      "D5.skip-ratio": {
+        "ratio": 0
+      },
+      "D5.negative-tests": {
+        "evidenceClass": "inferential",
+        "negative": {
+          "count": 16,
+          "tests": [
+            "qa/07-automation/e2e/tests/auth/login.login.spec.ts:106",
+            "qa/07-automation/e2e/tests/auth/login.login.spec.ts:120",
+            "qa/07-automation/e2e/tests/auth/login.login.spec.ts:152",
+            "qa/07-automation/e2e/tests/auth/login.login.spec.ts:44",
+            "qa/07-automation/e2e/tests/auth/login.login.spec.ts:65",
+            "qa/07-automation/e2e/tests/auth/login.login.spec.ts:75",
+            "qa/07-automation/e2e/tests/auth/login.login.spec.ts:85",
+            "qa/07-automation/e2e/tests/auth/login.login.spec.ts:93",
+            "qa/07-automation/e2e/tests/cart/checkout.spec.ts:120",
+            "qa/07-automation/e2e/tests/cart/checkout.spec.ts:58",
+            "qa/07-automation/e2e/tests/cart/checkout.spec.ts:89",
+            "qa/07-automation/e2e/tests/cart/checkout.spec.ts:98",
+            "qa/07-automation/e2e/tests/catalog/product-detail.spec.ts:83",
+            "qa/07-automation/integration/tests/security/read-only-guard.spec.ts:26",
+            "qa/07-automation/integration/tests/security/read-only-guard.spec.ts:35",
+            "qa/07-automation/integration/tests/security/read-only-guard.spec.ts:46"
+          ]
+        },
+        "boundary": {
+          "count": 16,
+          "tests": [
+            "qa/07-automation/e2e/tests/auth/login.login.spec.ts:143",
+            "qa/07-automation/e2e/tests/auth/login.login.spec.ts:65",
+            "qa/07-automation/e2e/tests/auth/login.login.spec.ts:75",
+            "qa/07-automation/e2e/tests/auth/login.login.spec.ts:85",
+            "qa/07-automation/e2e/tests/cart/cart-management.spec.ts:169",
+            "qa/07-automation/e2e/tests/cart/cart-management.spec.ts:181",
+            "qa/07-automation/e2e/tests/cart/cart-management.spec.ts:208",
+            "qa/07-automation/e2e/tests/cart/cart-management.spec.ts:219",
+            "qa/07-automation/e2e/tests/cart/checkout.spec.ts:206",
+            "qa/07-automation/e2e/tests/cart/checkout.spec.ts:277",
+            "qa/07-automation/e2e/tests/cart/checkout.spec.ts:58",
+            "qa/07-automation/e2e/tests/cart/checkout.spec.ts:66",
+            "qa/07-automation/e2e/tests/cart/checkout.spec.ts:79",
+            "qa/07-automation/e2e/tests/catalog/cart-badge.spec.ts:10",
+            "qa/07-automation/e2e/tests/catalog/category-listing.spec.ts:257",
+            "qa/07-automation/e2e/tests/catalog/shop-landing.spec.ts:87"
+          ]
+        },
+        "of": 128,
+        "vocabulary": "NEGATIVE_VOCABULARY in src/extract-source.js (documented in docs/EVIDENCE-CATALOGUE.md, D5.negative-tests)"
+      },
+      "D7.selector-mix": {
+        "semantic": 0,
+        "testId": 165,
+        "raw": 19,
+        "semanticShare": 0.897
+      },
+      "D7.file-size": {
+        "files": 15,
+        "maxTestsInOneFile": 20,
+        "medianTestsPerFile": 8
+      },
+      "D7.page-object-usage": {
+        "evidenceClass": "inferential",
+        "layeredTests": {
+          "count": 116,
+          "of": 128,
+          "share": 0.906
+        },
+        "inlineTests": {
+          "count": 12
+        },
+        "layers": {
+          "files": [
+            "qa/07-automation/e2e/fixtures/defects.ts",
+            "qa/07-automation/e2e/fixtures/shop-helpers.ts",
+            "qa/07-automation/e2e/page-objects/CheckoutPage.ts",
+            "qa/07-automation/e2e/page-objects/LoginPage.ts",
+            "qa/07-automation/integration/fixtures/base.ts",
+            "qa/07-automation/integration/fixtures/contract.ts",
+            "qa/07-automation/integration/fixtures/project-exclusions.ts",
+            "qa/07-automation/integration/fixtures/read-catalog.ts",
+            "qa/07-automation/integration/fixtures/write-catalog.ts",
+            "qa/07-automation/integration/scripts/api-guard.js",
+            "qa/07-automation/integration/scripts/hard-exclusions.js"
+          ],
+          "kinds": {
+            "pageObject": 2,
+            "fixture": 1,
+            "helper": 8
+          },
+          "unresolvedImports": 0
+        },
+        "customFixtures": {
+          "count": 1,
+          "files": [
+            "qa/07-automation/integration/fixtures/base.ts"
+          ]
+        }
+      },
+      "D3.retries-config": {
+        "bySuite": {
+          "qa/07-automation/e2e": {
+            "config": "qa/07-automation/e2e/playwright.config.ts",
+            "retries": "process.env.CI ? 2 : 0"
+          },
+          "qa/07-automation/integration": {
+            "config": "qa/07-automation/integration/playwright.config.ts",
+            "retries": "writeRun ? 0 : process.env.CI ? 1 : 0"
+          }
+        }
+      },
+      "D3.serial-mode": {
+        "bySuite": {
+          "qa/07-automation/e2e": {
+            "config": "qa/07-automation/e2e/playwright.config.ts",
+            "fullyParallel": "true",
+            "workers": "process.env.CI ? 1 : 2",
+            "describeSerial": 0,
+            "configuredSerial": 0
+          },
+          "qa/07-automation/integration": {
+            "config": "qa/07-automation/integration/playwright.config.ts",
+            "fullyParallel": "false",
+            "workers": "1",
+            "describeSerial": 1,
+            "configuredSerial": 0
+          }
+        }
+      },
+      "D4.reporter-config": {
+        "bySuite": {
+          "qa/07-automation/e2e": {
+            "config": "qa/07-automation/e2e/playwright.config.ts",
+            "reporters": [
+              "html",
+              "json",
+              "list"
+            ]
+          },
+          "qa/07-automation/integration": {
+            "config": "qa/07-automation/integration/playwright.config.ts",
+            "reporters": [
+              "list",
+              "html"
+            ]
+          }
+        }
+      },
+      "D4.trace-config": {
+        "bySuite": {
+          "qa/07-automation/e2e": {
+            "config": "qa/07-automation/e2e/playwright.config.ts",
+            "trace": "retain-on-failure",
+            "screenshot": "only-on-failure",
+            "video": "retain-on-failure"
+          },
+          "qa/07-automation/integration": {
+            "config": "qa/07-automation/integration/playwright.config.ts",
+            "trace": null,
+            "screenshot": null,
+            "video": null
+          }
+        }
+      },
+      "D4.artifact-retention": {
+        "bySuite": {
+          "qa/07-automation/e2e": {
+            "config": "qa/07-automation/e2e/playwright.config.ts",
+            "outputDir": "test-results/"
+          },
+          "qa/07-automation/integration": {
+            "config": "qa/07-automation/integration/playwright.config.ts",
+            "outputDir": "test-results/"
+          }
+        }
+      },
+      "D2.mutation-config": {
+        "count": 0,
+        "tools": []
+      },
+      "D0.suite-type-signals": {
+        "evidenceClass": "inferential",
+        "note": "signals only: the suite type is declared by the verdict, never computed here; every count is a number of tests",
+        "vocabulary": "DEFECT_ID in src/suite-type.js (documented in docs/EVIDENCE-CATALOGUE.md, D0.suite-type-signals)",
+        "suites": [
+          {
+            "suite": "qa/07-automation/e2e",
+            "testDir": "qa/07-automation/e2e/tests",
+            "directories": [
+              {
+                "directory": "auth",
+                "key": "qa/07-automation/e2e/auth",
+                "tests": 31,
+                "defectIds": {
+                  "count": 0,
+                  "examples": []
+                },
+                "expectedFailures": {
+                  "count": 0
+                },
+                "snapshotAssertions": {
+                  "count": 0
+                },
+                "caseIds": {
+                  "count": 31
+                },
+                "caseIdsLinkedToRules": {
+                  "count": 29
+                }
+              },
+              {
+                "directory": "cart",
+                "key": "qa/07-automation/e2e/cart",
+                "tests": 38,
+                "defectIds": {
+                  "count": 0,
+                  "examples": []
+                },
+                "expectedFailures": {
+                  "count": 0
+                },
+                "snapshotAssertions": {
+                  "count": 0
+                },
+                "caseIds": {
+                  "count": 38
+                },
+                "caseIdsLinkedToRules": {
+                  "count": 34
+                }
+              },
+              {
+                "directory": "catalog",
+                "key": "qa/07-automation/e2e/catalog",
+                "tests": 50,
+                "defectIds": {
+                  "count": 0,
+                  "examples": []
+                },
+                "expectedFailures": {
+                  "count": 0
+                },
+                "snapshotAssertions": {
+                  "count": 0
+                },
+                "caseIds": {
+                  "count": 50
+                },
+                "caseIdsLinkedToRules": {
+                  "count": 48
+                }
+              }
+            ]
+          },
+          {
+            "suite": "qa/07-automation/integration",
+            "testDir": "qa/07-automation/integration/tests",
+            "directories": [
+              {
+                "directory": ".",
+                "key": "qa/07-automation/integration/.",
+                "tests": 1,
+                "defectIds": {
+                  "count": 0,
+                  "examples": []
+                },
+                "expectedFailures": {
+                  "count": 0
+                },
+                "snapshotAssertions": {
+                  "count": 0
+                },
+                "caseIds": {
+                  "count": 0
+                },
+                "caseIdsLinkedToRules": {
+                  "count": 0
+                }
+              },
+              {
+                "directory": "security",
+                "key": "qa/07-automation/integration/security",
+                "tests": 6,
+                "defectIds": {
+                  "count": 0,
+                  "examples": []
+                },
+                "expectedFailures": {
+                  "count": 0
+                },
+                "snapshotAssertions": {
+                  "count": 0
+                },
+                "caseIds": {
+                  "count": 0
+                },
+                "caseIdsLinkedToRules": {
+                  "count": 0
+                }
+              },
+              {
+                "directory": "write",
+                "key": "qa/07-automation/integration/write",
+                "tests": 2,
+                "defectIds": {
+                  "count": 0,
+                  "examples": []
+                },
+                "expectedFailures": {
+                  "count": 0
+                },
+                "snapshotAssertions": {
+                  "count": 0
+                },
+                "caseIds": {
+                  "count": 0
+                },
+                "caseIdsLinkedToRules": {
+                  "count": 0
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "rules": {
+      "D1.risk-inventory": {
+        "present": false,
+        "register": null,
+        "risks": 0
+      },
+      "D5.risk-coverage": {
+        "count": 0,
+        "of": 0,
+        "ratio": null,
+        "evidenceClass": "inferential",
+        "covered": [],
+        "uncovered": []
+      },
+      "D1.rule-inventory": {
+        "documents": 48,
+        "documentsExcluded": 3,
+        "layout": "framework",
+        "rulesDeclared": 105,
+        "present": true
+      },
+      "D1.spec-linkage": {
+        "casesDeclared": 119,
+        "casesWithRuleRef": 111,
+        "ratio": 0.933
+      },
+      "D1.automated-case-ids": {
+        "count": 119
+      },
+      "D5.rule-catalogue": {
+        "count": 105,
+        "rules": [
+          {
+            "id": "FL-AUTH-001",
+            "title": "Inicio de sesión exitoso",
+            "file": "qa/01-specifications/module-auth/submodule-login/02-workflows.md",
+            "line": 3
+          },
+          {
+            "id": "FL-AUTH-002",
+            "title": "Inicio de sesión rechazado",
+            "file": "qa/01-specifications/module-auth/submodule-login/02-workflows.md",
+            "line": 36
+          },
+          {
+            "id": "FL-AUTH-003",
+            "title": "Recordar email entre visitas",
+            "file": "qa/01-specifications/module-auth/submodule-login/02-workflows.md",
+            "line": 64
+          },
+          {
+            "id": "FL-AUTH-004",
+            "title": "Acceso a una página protegida sin sesión",
+            "file": "qa/01-specifications/module-auth/submodule-session/02-workflows.md",
+            "line": 3
+          },
+          {
+            "id": "FL-AUTH-005",
+            "title": "Cierre de sesión",
+            "file": "qa/01-specifications/module-auth/submodule-session/02-workflows.md",
+            "line": 26
+          },
+          {
+            "id": "FL-AUTH-006",
+            "title": "Pérdida de la sesión durante la navegación (ruta de error)",
+            "file": "qa/01-specifications/module-auth/submodule-session/02-workflows.md",
+            "line": 53
+          },
+          {
+            "id": "FL-CART-001",
+            "title": "Agregar productos y revisar el carrito (camino feliz)",
+            "file": "qa/01-specifications/module-cart/submodule-cart-management/02-workflows.md",
+            "line": 3
+          },
+          {
+            "id": "FL-CART-002",
+            "title": "Modificar cantidad y eliminar productos",
+            "file": "qa/01-specifications/module-cart/submodule-cart-management/02-workflows.md",
+            "line": 31
+          },
+          {
+            "id": "FL-CART-003",
+            "title": "Carrito vacío y retorno a la tienda",
+            "file": "qa/01-specifications/module-cart/submodule-cart-management/02-workflows.md",
+            "line": 60
+          },
+          {
+            "id": "FL-CART-004",
+            "title": "Compra completa (camino feliz)",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/02-workflows.md",
+            "line": 3
+          },
+          {
+            "id": "FL-CART-005",
+            "title": "Rechazo por validación del formulario",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/02-workflows.md",
+            "line": 34
+          },
+          {
+            "id": "FL-CART-006",
+            "title": "Volver atrás durante el checkout (cancelación)",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/02-workflows.md",
+            "line": 59
+          },
+          {
+            "id": "FL-CART-007",
+            "title": "Acceso fuera de secuencia (camino de error)",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/02-workflows.md",
+            "line": 78
+          },
+          {
+            "id": "FL-CAT-001",
+            "title": "Ingresar a la tienda y elegir una categoría",
+            "file": "qa/01-specifications/module-catalog/submodule-shop-landing/02-workflows.md",
+            "line": 3
+          },
+          {
+            "id": "FL-CAT-002",
+            "title": "Acceso sin sesión (rechazo)",
+            "file": "qa/01-specifications/module-catalog/submodule-shop-landing/02-workflows.md",
+            "line": 27
+          },
+          {
+            "id": "FL-CAT-010",
+            "title": "Explorar una categoría y refinar con filtros",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/02-workflows.md",
+            "line": 3
+          },
+          {
+            "id": "FL-CAT-011",
+            "title": "Buscar y ordenar dentro de la categoría",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/02-workflows.md",
+            "line": 30
+          },
+          {
+            "id": "FL-CAT-012",
+            "title": "Salir del listado",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/02-workflows.md",
+            "line": 54
+          },
+          {
+            "id": "FL-CAT-013",
+            "title": "Ruta de error - acceso sin sesión a una categoría",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/02-workflows.md",
+            "line": 74
+          },
+          {
+            "id": "FL-CAT-030",
+            "title": "Consultar el detalle y agregar al carrito",
+            "file": "qa/01-specifications/module-catalog/submodule-product-detail/02-workflows.md",
+            "line": 3
+          },
+          {
+            "id": "FL-CAT-031",
+            "title": "Ruta de error - producto inexistente",
+            "file": "qa/01-specifications/module-catalog/submodule-product-detail/02-workflows.md",
+            "line": 30
+          },
+          {
+            "id": "FL-CAT-040",
+            "title": "Agregar productos desde el listado",
+            "file": "qa/01-specifications/module-catalog/submodule-cart-badge/02-workflows.md",
+            "line": 3
+          },
+          {
+            "id": "FL-CAT-041",
+            "title": "Persistencia del carrito entre páginas, recargas y sesiones",
+            "file": "qa/01-specifications/module-catalog/submodule-cart-badge/02-workflows.md",
+            "line": 25
+          },
+          {
+            "id": "FL-CAT-042",
+            "title": "Ruta de error - carrito corrupto",
+            "file": "qa/01-specifications/module-catalog/submodule-cart-badge/02-workflows.md",
+            "line": 44
+          },
+          {
+            "id": "RN-AUTH-001",
+            "title": "Email obligatorio",
+            "file": "qa/01-specifications/module-auth/submodule-login/01-business-rules.md",
+            "line": 5
+          },
+          {
+            "id": "RN-AUTH-002",
+            "title": "Contraseña obligatoria",
+            "file": "qa/01-specifications/module-auth/submodule-login/01-business-rules.md",
+            "line": 13
+          },
+          {
+            "id": "RN-AUTH-003",
+            "title": "Orden de validación y un solo error a la vez",
+            "file": "qa/01-specifications/module-auth/submodule-login/01-business-rules.md",
+            "line": 20
+          },
+          {
+            "id": "RN-AUTH-004",
+            "title": "Formato de email",
+            "file": "qa/01-specifications/module-auth/submodule-login/01-business-rules.md",
+            "line": 27
+          },
+          {
+            "id": "RN-AUTH-005",
+            "title": "Longitud mínima de contraseña",
+            "file": "qa/01-specifications/module-auth/submodule-login/01-business-rules.md",
+            "line": 35
+          },
+          {
+            "id": "RN-AUTH-006",
+            "title": "Credenciales aceptadas",
+            "file": "qa/01-specifications/module-auth/submodule-login/01-business-rules.md",
+            "line": 43
+          },
+          {
+            "id": "RN-AUTH-007",
+            "title": "Credenciales inválidas con mensaje genérico",
+            "file": "qa/01-specifications/module-auth/submodule-login/01-business-rules.md",
+            "line": 50
+          },
+          {
+            "id": "RN-AUTH-008",
+            "title": "Recorte de espacios en las credenciales",
+            "file": "qa/01-specifications/module-auth/submodule-login/01-business-rules.md",
+            "line": 57
+          },
+          {
+            "id": "RN-AUTH-009",
+            "title": "Limpieza de errores al escribir",
+            "file": "qa/01-specifications/module-auth/submodule-login/01-business-rules.md",
+            "line": 63
+          },
+          {
+            "id": "RN-AUTH-010",
+            "title": "Remember me",
+            "file": "qa/01-specifications/module-auth/submodule-login/01-business-rules.md",
+            "line": 69
+          },
+          {
+            "id": "RN-AUTH-011",
+            "title": "Mostrar/ocultar contraseña",
+            "file": "qa/01-specifications/module-auth/submodule-login/01-business-rules.md",
+            "line": 76
+          },
+          {
+            "id": "RN-AUTH-012",
+            "title": "Autocompletar credenciales demo",
+            "file": "qa/01-specifications/module-auth/submodule-login/01-business-rules.md",
+            "line": 82
+          },
+          {
+            "id": "RN-AUTH-013",
+            "title": "Usuarios registrados dependen de `localStorage.users`",
+            "file": "qa/01-specifications/module-auth/submodule-login/01-business-rules.md",
+            "line": 88
+          },
+          {
+            "id": "RN-AUTH-014",
+            "title": "El login exitoso crea la sesión",
+            "file": "qa/01-specifications/module-auth/submodule-session/01-business-rules.md",
+            "line": 3
+          },
+          {
+            "id": "RN-AUTH-015",
+            "title": "Solo un usuario autenticado accede a las páginas protegidas",
+            "file": "qa/01-specifications/module-auth/submodule-session/01-business-rules.md",
+            "line": 10
+          },
+          {
+            "id": "RN-AUTH-016",
+            "title": "Cierre de sesión",
+            "file": "qa/01-specifications/module-auth/submodule-session/01-business-rules.md",
+            "line": 17
+          },
+          {
+            "id": "RN-AUTH-017",
+            "title": "Visibilidad de los controles del encabezado",
+            "file": "qa/01-specifications/module-auth/submodule-session/01-business-rules.md",
+            "line": 24
+          },
+          {
+            "id": "RN-AUTH-018",
+            "title": "Alcance de la sesión",
+            "file": "qa/01-specifications/module-auth/submodule-session/01-business-rules.md",
+            "line": 31
+          },
+          {
+            "id": "RN-CART-001",
+            "title": "Agregar un producto nuevo al carrito",
+            "file": "qa/01-specifications/module-cart/submodule-cart-management/01-business-rules.md",
+            "line": 6
+          },
+          {
+            "id": "RN-CART-002",
+            "title": "Agregar un producto ya existente incrementa la cantidad",
+            "file": "qa/01-specifications/module-cart/submodule-cart-management/01-business-rules.md",
+            "line": 13
+          },
+          {
+            "id": "RN-CART-003",
+            "title": "Subtotal de línea",
+            "file": "qa/01-specifications/module-cart/submodule-cart-management/01-business-rules.md",
+            "line": 20
+          },
+          {
+            "id": "RN-CART-004",
+            "title": "Cantidad válida",
+            "file": "qa/01-specifications/module-cart/submodule-cart-management/01-business-rules.md",
+            "line": 27
+          },
+          {
+            "id": "RN-CART-005",
+            "title": "La cantidad mínima es 1",
+            "file": "qa/01-specifications/module-cart/submodule-cart-management/01-business-rules.md",
+            "line": 34
+          },
+          {
+            "id": "RN-CART-006",
+            "title": "Cantidad vacía o no entera se normaliza a 1",
+            "file": "qa/01-specifications/module-cart/submodule-cart-management/01-business-rules.md",
+            "line": 42
+          },
+          {
+            "id": "RN-CART-007",
+            "title": "Total del carrito",
+            "file": "qa/01-specifications/module-cart/submodule-cart-management/01-business-rules.md",
+            "line": 48
+          },
+          {
+            "id": "RN-CART-008",
+            "title": "Eliminar un producto",
+            "file": "qa/01-specifications/module-cart/submodule-cart-management/01-business-rules.md",
+            "line": 55
+          },
+          {
+            "id": "RN-CART-009",
+            "title": "Estado de carrito vacío",
+            "file": "qa/01-specifications/module-cart/submodule-cart-management/01-business-rules.md",
+            "line": 61
+          },
+          {
+            "id": "RN-CART-010",
+            "title": "Acceso a cart.php requiere sesión",
+            "file": "qa/01-specifications/module-cart/submodule-cart-management/01-business-rules.md",
+            "line": 67
+          },
+          {
+            "id": "RN-CART-011",
+            "title": "El carrito es local al navegador y sobrevive al logout",
+            "file": "qa/01-specifications/module-cart/submodule-cart-management/01-business-rules.md",
+            "line": 74
+          },
+          {
+            "id": "RN-CART-012",
+            "title": "Nombre y precio provienen del catálogo estático",
+            "file": "qa/01-specifications/module-cart/submodule-cart-management/01-business-rules.md",
+            "line": 80
+          },
+          {
+            "id": "RN-CART-013",
+            "title": "Campos obligatorios del checkout",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/01-business-rules.md",
+            "line": 6
+          },
+          {
+            "id": "RN-CART-014",
+            "title": "Orden de validación y un solo error a la vez",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/01-business-rules.md",
+            "line": 14
+          },
+          {
+            "id": "RN-CART-015",
+            "title": "Los errores se ocultan al escribir",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/01-business-rules.md",
+            "line": 21
+          },
+          {
+            "id": "RN-CART-016",
+            "title": "Formato de email",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/01-business-rules.md",
+            "line": 27
+          },
+          {
+            "id": "RN-CART-017",
+            "title": "Teléfono de 10 dígitos",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/01-business-rules.md",
+            "line": 35
+          },
+          {
+            "id": "RN-CART-018",
+            "title": "Pin Code numérico y positivo",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/01-business-rules.md",
+            "line": 43
+          },
+          {
+            "id": "RN-CART-019",
+            "title": "Checkout exitoso navega a la confirmación",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/01-business-rules.md",
+            "line": 49
+          },
+          {
+            "id": "RN-CART-020",
+            "title": "Datos del cliente se guardan solo en el navegador",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/01-business-rules.md",
+            "line": 56
+          },
+          {
+            "id": "RN-CART-021",
+            "title": "La confirmación muestra los datos ingresados y el resumen de la orden",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/01-business-rules.md",
+            "line": 62
+          },
+          {
+            "id": "RN-CART-022",
+            "title": "Volver desde la confirmación",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/01-business-rules.md",
+            "line": 69
+          },
+          {
+            "id": "RN-CART-023",
+            "title": "Totales consistentes entre carrito, checkout y confirmación",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/01-business-rules.md",
+            "line": 75
+          },
+          {
+            "id": "RN-CART-024",
+            "title": "Realizar la orden",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/01-business-rules.md",
+            "line": 81
+          },
+          {
+            "id": "RN-CART-025",
+            "title": "No se puede hacer checkout con el carrito vacío",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/01-business-rules.md",
+            "line": 87
+          },
+          {
+            "id": "RN-CART-026",
+            "title": "La confirmación y la orden exitosa requieren un checkout completado",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/01-business-rules.md",
+            "line": 94
+          },
+          {
+            "id": "RN-CART-027",
+            "title": "Páginas del checkout requieren sesión",
+            "file": "qa/01-specifications/module-cart/submodule-checkout/01-business-rules.md",
+            "line": 101
+          },
+          {
+            "id": "RN-CAT-001",
+            "title": "Acceso al catálogo requiere sesión iniciada",
+            "file": "qa/01-specifications/module-catalog/submodule-shop-landing/01-business-rules.md",
+            "line": 3
+          },
+          {
+            "id": "RN-CAT-002",
+            "title": "shop.php presenta exactamente 4 categorías",
+            "file": "qa/01-specifications/module-catalog/submodule-shop-landing/01-business-rules.md",
+            "line": 11
+          },
+          {
+            "id": "RN-CAT-003",
+            "title": "Cada botón \"Shop Now\" lleva a su categoría",
+            "file": "qa/01-specifications/module-catalog/submodule-shop-landing/01-business-rules.md",
+            "line": 18
+          },
+          {
+            "id": "RN-CAT-004",
+            "title": "El logo y el enlace \"Shop\" vuelven a shop.php",
+            "file": "qa/01-specifications/module-catalog/submodule-shop-landing/01-business-rules.md",
+            "line": 24
+          },
+          {
+            "id": "RN-CAT-005",
+            "title": "Breadcrumb de shop.php",
+            "file": "qa/01-specifications/module-catalog/submodule-shop-landing/01-business-rules.md",
+            "line": 30
+          },
+          {
+            "id": "RN-CAT-006",
+            "title": "La búsqueda de la cabecera no busca en el catálogo",
+            "file": "qa/01-specifications/module-catalog/submodule-shop-landing/01-business-rules.md",
+            "line": 37
+          },
+          {
+            "id": "RN-CAT-010",
+            "title": "Cada página de categoría muestra solo productos de su categoría",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/01-business-rules.md",
+            "line": 3
+          },
+          {
+            "id": "RN-CAT-011",
+            "title": "Contenido mínimo de la tarjeta de producto",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/01-business-rules.md",
+            "line": 10
+          },
+          {
+            "id": "RN-CAT-012",
+            "title": "Contador de resultados",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/01-business-rules.md",
+            "line": 17
+          },
+          {
+            "id": "RN-CAT-013",
+            "title": "Filtros dentro de un mismo grupo se combinan con OR",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/01-business-rules.md",
+            "line": 23
+          },
+          {
+            "id": "RN-CAT-014",
+            "title": "Filtros de grupos distintos se combinan con AND",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/01-business-rules.md",
+            "line": 29
+          },
+          {
+            "id": "RN-CAT-015",
+            "title": "Búsqueda por nombre, sin distinción de mayúsculas y con recorte de espacios",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/01-business-rules.md",
+            "line": 35
+          },
+          {
+            "id": "RN-CAT-016",
+            "title": "Mensaje cuando no hay resultados",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/01-business-rules.md",
+            "line": 42
+          },
+          {
+            "id": "RN-CAT-017",
+            "title": "Ordenamiento",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/01-business-rules.md",
+            "line": 49
+          },
+          {
+            "id": "RN-CAT-018",
+            "title": "Rangos de precio inclusivos",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/01-business-rules.md",
+            "line": 55
+          },
+          {
+            "id": "RN-CAT-019",
+            "title": "Filtros específicos de Electronics",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/01-business-rules.md",
+            "line": 61
+          },
+          {
+            "id": "RN-CAT-020",
+            "title": "El estado de filtros, búsqueda y orden no persiste al recargar",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/01-business-rules.md",
+            "line": 67
+          },
+          {
+            "id": "RN-CAT-021",
+            "title": "\"Go To Back\" vuelve a shop.php",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/01-business-rules.md",
+            "line": 73
+          },
+          {
+            "id": "RN-CAT-022",
+            "title": "El nombre del producto enlaza al detalle",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/01-business-rules.md",
+            "line": 79
+          },
+          {
+            "id": "RN-CAT-023",
+            "title": "Breadcrumb de la categoría",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/01-business-rules.md",
+            "line": 85
+          },
+          {
+            "id": "RN-CAT-024",
+            "title": "Las opciones de filtro dependen de la categoría y del catálogo estático",
+            "file": "qa/01-specifications/module-catalog/submodule-category-listing/01-business-rules.md",
+            "line": 92
+          },
+          {
+            "id": "RN-CAT-030",
+            "title": "El detalle requiere sesión",
+            "file": "qa/01-specifications/module-catalog/submodule-product-detail/01-business-rules.md",
+            "line": 3
+          },
+          {
+            "id": "RN-CAT-031",
+            "title": "El detalle es consistente con el listado",
+            "file": "qa/01-specifications/module-catalog/submodule-product-detail/01-business-rules.md",
+            "line": 9
+          },
+          {
+            "id": "RN-CAT-032",
+            "title": "Producto inexistente o id inválido",
+            "file": "qa/01-specifications/module-catalog/submodule-product-detail/01-business-rules.md",
+            "line": 15
+          },
+          {
+            "id": "RN-CAT-033",
+            "title": "Breadcrumb del detalle",
+            "file": "qa/01-specifications/module-catalog/submodule-product-detail/01-business-rules.md",
+            "line": 22
+          },
+          {
+            "id": "RN-CAT-034",
+            "title": "\"Go To Back\" del detalle vuelve a shop.php",
+            "file": "qa/01-specifications/module-catalog/submodule-product-detail/01-business-rules.md",
+            "line": 28
+          },
+          {
+            "id": "RN-CAT-035",
+            "title": "Agregar al carrito desde el detalle",
+            "file": "qa/01-specifications/module-catalog/submodule-product-detail/01-business-rules.md",
+            "line": 34
+          },
+          {
+            "id": "RN-CAT-040",
+            "title": "El badge muestra la cantidad de líneas del carrito",
+            "file": "qa/01-specifications/module-catalog/submodule-cart-badge/01-business-rules.md",
+            "line": 3
+          },
+          {
+            "id": "RN-CAT-041",
+            "title": "Agregar un producto nuevo crea una línea con qty 1",
+            "file": "qa/01-specifications/module-catalog/submodule-cart-badge/01-business-rules.md",
+            "line": 10
+          },
+          {
+            "id": "RN-CAT-042",
+            "title": "Agregar un producto existente incrementa qty sin cambiar el badge",
+            "file": "qa/01-specifications/module-catalog/submodule-cart-badge/01-business-rules.md",
+            "line": 16
+          },
+          {
+            "id": "RN-CAT-043",
+            "title": "El badge persiste entre páginas y recargas",
+            "file": "qa/01-specifications/module-catalog/submodule-cart-badge/01-business-rules.md",
+            "line": 22
+          },
+          {
+            "id": "RN-CAT-044",
+            "title": "Filtros, búsqueda y orden no modifican el carrito",
+            "file": "qa/01-specifications/module-catalog/submodule-cart-badge/01-business-rules.md",
+            "line": 28
+          },
+          {
+            "id": "RN-CAT-045",
+            "title": "Sin retroalimentación adicional al agregar",
+            "file": "qa/01-specifications/module-catalog/submodule-cart-badge/01-business-rules.md",
+            "line": 34
+          },
+          {
+            "id": "RN-CAT-046",
+            "title": "El badge no se sincroniza entre pestañas",
+            "file": "qa/01-specifications/module-catalog/submodule-cart-badge/01-business-rules.md",
+            "line": 41
+          },
+          {
+            "id": "RN-CAT-047",
+            "title": "El carrito sobrevive al logout",
+            "file": "qa/01-specifications/module-catalog/submodule-cart-badge/01-business-rules.md",
+            "line": 48
+          },
+          {
+            "id": "RN-CAT-048",
+            "title": "Carrito corrupto en localStorage",
+            "file": "qa/01-specifications/module-catalog/submodule-cart-badge/01-business-rules.md",
+            "line": 55
+          }
+        ]
+      },
+      "D5.covered-rules": {
+        "count": 86,
+        "of": 105,
+        "ratio": 0.819,
+        "rules": [
+          "FL-AUTH-001",
+          "FL-AUTH-003",
+          "FL-AUTH-004",
+          "FL-AUTH-005",
+          "FL-AUTH-006",
+          "FL-CART-004",
+          "FL-CART-006",
+          "RN-AUTH-001",
+          "RN-AUTH-002",
+          "RN-AUTH-003",
+          "RN-AUTH-004",
+          "RN-AUTH-005",
+          "RN-AUTH-006",
+          "RN-AUTH-007",
+          "RN-AUTH-008",
+          "RN-AUTH-009",
+          "RN-AUTH-010",
+          "RN-AUTH-011",
+          "RN-AUTH-012",
+          "RN-AUTH-013",
+          "RN-AUTH-015",
+          "RN-AUTH-016",
+          "RN-AUTH-017",
+          "RN-AUTH-018",
+          "RN-CART-001",
+          "RN-CART-002",
+          "RN-CART-003",
+          "RN-CART-004",
+          "RN-CART-005",
+          "RN-CART-006",
+          "RN-CART-007",
+          "RN-CART-008",
+          "RN-CART-009",
+          "RN-CART-010",
+          "RN-CART-011",
+          "RN-CART-012",
+          "RN-CART-013",
+          "RN-CART-014",
+          "RN-CART-015",
+          "RN-CART-016",
+          "RN-CART-017",
+          "RN-CART-018",
+          "RN-CART-019",
+          "RN-CART-020",
+          "RN-CART-021",
+          "RN-CART-022",
+          "RN-CART-023",
+          "RN-CART-024",
+          "RN-CART-025",
+          "RN-CART-026",
+          "RN-CART-027",
+          "RN-CAT-001",
+          "RN-CAT-002",
+          "RN-CAT-003",
+          "RN-CAT-004",
+          "RN-CAT-005",
+          "RN-CAT-006",
+          "RN-CAT-010",
+          "RN-CAT-011",
+          "RN-CAT-012",
+          "RN-CAT-013",
+          "RN-CAT-014",
+          "RN-CAT-015",
+          "RN-CAT-016",
+          "RN-CAT-017",
+          "RN-CAT-018",
+          "RN-CAT-019",
+          "RN-CAT-020",
+          "RN-CAT-021",
+          "RN-CAT-022",
+          "RN-CAT-023",
+          "RN-CAT-030",
+          "RN-CAT-031",
+          "RN-CAT-032",
+          "RN-CAT-033",
+          "RN-CAT-034",
+          "RN-CAT-035",
+          "RN-CAT-040",
+          "RN-CAT-041",
+          "RN-CAT-042",
+          "RN-CAT-043",
+          "RN-CAT-044",
+          "RN-CAT-045",
+          "RN-CAT-046",
+          "RN-CAT-047",
+          "RN-CAT-048"
+        ]
+      },
+      "D5.uncovered-rules": {
+        "count": 19,
+        "rules": [
+          "FL-AUTH-002",
+          "FL-CART-001",
+          "FL-CART-002",
+          "FL-CART-003",
+          "FL-CART-005",
+          "FL-CART-007",
+          "FL-CAT-001",
+          "FL-CAT-002",
+          "FL-CAT-010",
+          "FL-CAT-011",
+          "FL-CAT-012",
+          "FL-CAT-013",
+          "FL-CAT-030",
+          "FL-CAT-031",
+          "FL-CAT-040",
+          "FL-CAT-041",
+          "FL-CAT-042",
+          "RN-AUTH-014",
+          "RN-CAT-024"
+        ]
+      },
+      "D5.orphan-tests": {
+        "count": 0,
+        "note": "automated cases whose id is declared in no scenario document",
+        "cases": []
+      },
+      "D5.pending-markers": {
+        "count": 0,
+        "note": "markers for information the analysis could not confirm"
+      }
+    },
+    "pipelines": {
+      "D6.pipeline-present": {
+        "yamlScanned": 1,
+        "pipelinesIdentified": 1,
+        "files": [
+          ".github/workflows/e2e.yml"
+        ]
+      },
+      "D6.suite-invocation": {
+        "pipelinesRunningTheSuite": 1,
+        "note": "a pipeline counts only when it invokes the runner (directly, or through an npm/yarn/pnpm script that expands to playwright test; an unresolvable npm test still counts) AND names a resolved suite directory",
+        "files": [
+          ".github/workflows/e2e.yml"
+        ]
+      },
+      "D6.run-scope": {
+        "pipelines": [
+          {
+            "file": ".github/workflows/e2e.yml",
+            "invocations": [
+              {
+                "line": 72,
+                "raw": "npx playwright test --project=chromium --project=login-flow --workers=\"$WORKERS\"",
+                "scope": "filtered",
+                "filters": [
+                  {
+                    "flag": "--project",
+                    "value": "chromium"
+                  },
+                  {
+                    "flag": "--project",
+                    "value": "login-flow"
+                  }
+                ],
+                "paths": []
+              }
+            ]
+          }
+        ],
+        "filteredPipelines": 1,
+        "fullPipelines": 0,
+        "note": "scope is read from the pipeline text; a filter marked variable is set outside the repository and its effective scope is unknowable here"
+      },
+      "D6.pipeline-triggers": {
+        "push": 0,
+        "pullRequest": 0,
+        "schedule": 0,
+        "manual": 1
+      },
+      "D6.result-publication": {
+        "publishingResults": 1,
+        "publishingToTestPlans": 0
+      },
+      "D6.declared-gating": {
+        "pipelinesDeclaringPrTrigger": 0,
+        "evidenceClass": "declaration",
+        "note": "a pull request trigger is an intention; enforcement lives in the branch policy and is out of scope for v1"
+      }
+    }
+  },
+  "suiteFiles": [
+    "qa/07-automation/e2e/tests/auth/login.login.spec.ts",
+    "qa/07-automation/e2e/tests/auth/session.spec.ts",
+    "qa/07-automation/e2e/tests/cart/cart-management.login.spec.ts",
+    "qa/07-automation/e2e/tests/cart/cart-management.spec.ts",
+    "qa/07-automation/e2e/tests/cart/checkout.spec.ts",
+    "qa/07-automation/e2e/tests/catalog/cart-badge.login.spec.ts",
+    "qa/07-automation/e2e/tests/catalog/cart-badge.spec.ts",
+    "qa/07-automation/e2e/tests/catalog/category-listing.spec.ts",
+    "qa/07-automation/e2e/tests/catalog/product-detail.spec.ts",
+    "qa/07-automation/e2e/tests/catalog/shop-landing.spec.ts",
+    "qa/07-automation/integration/tests/example.spec.ts",
+    "qa/07-automation/integration/tests/security/catalogs.spec.ts",
+    "qa/07-automation/integration/tests/security/no-session.spec.ts",
+    "qa/07-automation/integration/tests/security/read-only-guard.spec.ts",
+    "qa/07-automation/integration/tests/write/example-write-cycle.spec.ts"
+  ]
+}
